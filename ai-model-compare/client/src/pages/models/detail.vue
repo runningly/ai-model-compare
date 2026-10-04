@@ -1,5 +1,9 @@
 <template>
-  <view v-if="model" class="page">
+  <view v-if="loading" class="page empty-page">
+    <text>加载中...</text>
+  </view>
+
+  <view v-else-if="model" class="page">
     <!-- 模型头部 -->
     <view class="card">
       <view class="head-row">
@@ -72,18 +76,25 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { mockModels } from '@/mock/models'
+import { getModelById } from '@/api/models'
 import type { AIModel } from '@/types/model'
 import { useFavoritesStore } from '@/stores/favorites'
 
 const model = ref<AIModel | null>(null)
+const loading = ref(true)
 const fav = useFavoritesStore()
 
 const isFav = computed(() => (model.value ? fav.has(model.value.id) : false))
 
-onLoad((options) => {
+onLoad(async (options) => {
   const id = options?.id || ''
-  model.value = mockModels.find((m) => m.id === id) || null
+  try {
+    model.value = await getModelById(id)
+  } catch {
+    model.value = null
+  } finally {
+    loading.value = false
+  }
 })
 
 function fmtPrice(v: number | null | undefined): string {

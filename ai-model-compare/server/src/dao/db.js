@@ -23,5 +23,12 @@ db.exec(`
     purchase_url   TEXT NOT NULL,
     free           INTEGER DEFAULT 0,
     remark         TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS favorites (
+    user_id    TEXT NOT NULL,
+    model_id   TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, model_id)
   )
 `)

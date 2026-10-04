@@ -1,6 +1,10 @@
 <template>
   <view class="page">
-    <view v-if="list.length" class="model-list">
+    <view v-if="loading" class="empty">
+      <text>加载中...</text>
+    </view>
+
+    <view v-else-if="list.length" class="model-list">
       <view v-for="m in list" :key="m.id" class="card">
         <view class="card-head" @click="goDetail(m.id)">
           <text class="model-name">{{ m.modelName }}</text>
@@ -25,13 +29,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { mockModels } from '@/mock/models'
+import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { getModels } from '@/api/models'
 import { useFavoritesStore } from '@/stores/favorites'
+import type { AIModel } from '@/types/model'
 
 const fav = useFavoritesStore()
 
-const list = computed(() => mockModels.filter((m) => fav.ids.includes(m.id)))
+// 每次进入页面：先同步一次云端收藏，再拉模型列表做过滤
+const models = ref<AIModel[]>([])
+const loading = ref(true)
+
+onShow(async () => {
+  loading.value = true
+  try {
+    await fav.hydrate()
+    models.value = await getModels()
+  } catch {
+    // 请求层已统一提示错误；此处保持空态展示
+  } finally {
+    loading.value = false
+  }
+})
+
+const list = computed(() => models.value.filter((m) => fav.ids.includes(m.id)))
 
 function fmtPrice(v: number | null | undefined): string {
   return v == null ? '免费' : `¥${v}`

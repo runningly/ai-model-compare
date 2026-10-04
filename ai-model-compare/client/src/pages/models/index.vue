@@ -24,13 +24,19 @@
 
     <view class="unit-note">价格单位：元 / 百万 tokens（演示快照，以官网为准）</view>
 
-    <!-- 骨架屏：模拟加载 -->
+    <!-- 骨架屏：加载中 -->
     <view v-if="loading" class="model-list">
       <view v-for="i in 4" :key="i" class="card">
         <view class="sk sk-name"></view>
         <view class="sk sk-line"></view>
         <view class="sk sk-line sk-line--short"></view>
       </view>
+    </view>
+
+    <!-- 加载失败：点击重试 -->
+    <view v-else-if="loadError" class="empty" @click="load">
+      <text>加载失败，请确认后端服务已启动</text>
+      <text class="empty-retry">点击重试</text>
     </view>
 
     <!-- 模型列表 -->
@@ -79,7 +85,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { mockModels } from '@/mock/models'
+import { onLoad } from '@dcloudio/uni-app'
+import { getModels } from '@/api/models'
 import type { AIModel, Vendor } from '@/types/model'
 
 const keyword = ref('')
@@ -87,14 +94,29 @@ type VendorTab = Vendor | '全部'
 const currentVendor = ref<VendorTab>('全部')
 const vendorTabs: VendorTab[] = ['全部', 'DeepSeek', '智谱GLM', '通义千问', '豆包', 'Kimi']
 
-// 骨架屏演示：模拟一次短暂的加载过程
+// 真实接口：加载模型列表（骨架屏为真实 loading）
+const models = ref<AIModel[]>([])
 const loading = ref(true)
-setTimeout(() => {
-  loading.value = false
-}, 400)
+const loadError = ref(false)
+
+async function load() {
+  loading.value = true
+  loadError.value = false
+  try {
+    models.value = await getModels()
+  } catch {
+    loadError.value = true
+  } finally {
+    loading.value = false
+  }
+}
+
+onLoad(() => {
+  load()
+})
 
 const filteredModels = computed<AIModel[]>(() =>
-  mockModels.filter((m) => {
+  models.value.filter((m) => {
     const matchVendor = currentVendor.value === '全部' || m.vendor === currentVendor.value
     const kw = keyword.value.trim().toLowerCase()
     const matchKeyword = !kw || `${m.modelName}${m.vendor}`.toLowerCase().includes(kw)
@@ -254,6 +276,13 @@ function goDetail(id: string) {
   color: #8a8f99;
   padding: 120rpx 0;
   font-size: 26rpx;
+}
+
+.empty-retry {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #3b5bff;
 }
 
 /* 骨架屏 */
