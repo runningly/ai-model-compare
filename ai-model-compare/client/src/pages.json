@@ -1,0 +1,44 @@
+{
+  "pages": [
+    {
+      "path": "pages/models/index",
+      "style": {
+        "navigationBarTitleText": "AI 模型比价"
+      }
+    },
+    {
+      "path": "pages/favorites/index",
+      "style": {
+        "navigationBarTitleText": "我的收藏"
+      }
+    },
+    {
+      "path": "pages/models/detail",
+      "style": {
+        "navigationBarTitleText": "模型详情"
+      }
+    }
+  ],
+  "tabBar": {
+    "color": "#8a8f99",
+    "selectedColor": "#3b5bff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/models/index",
+        "text": "模型列表"
+      },
+      {
+        "pagePath": "pages/favorites/index",
+        "text": "我的收藏"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "AI 模型比价",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f5f6fa"
+  }
+}
