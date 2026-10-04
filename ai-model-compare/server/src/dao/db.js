@@ -28,7 +28,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS favorites (
     user_id    TEXT NOT NULL,
     model_id   TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
     PRIMARY KEY (user_id, model_id)
   )
 `)

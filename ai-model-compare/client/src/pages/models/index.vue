@@ -92,12 +92,17 @@ import type { AIModel, Vendor } from '@/types/model'
 const keyword = ref('')
 type VendorTab = Vendor | '全部'
 const currentVendor = ref<VendorTab>('全部')
-const vendorTabs: VendorTab[] = ['全部', 'DeepSeek', '智谱GLM', '通义千问', '豆包', 'Kimi']
 
 // 真实接口：加载模型列表（骨架屏为真实 loading）
 const models = ref<AIModel[]>([])
 const loading = ref(true)
 const loadError = ref(false)
+
+// 厂商 chips 跟随接口数据动态生成（后端新增厂商自动出现）
+const vendorTabs = computed<VendorTab[]>(() => [
+  '全部',
+  ...new Set(models.value.map((m) => m.vendor)),
+])
 
 async function load() {
   loading.value = true

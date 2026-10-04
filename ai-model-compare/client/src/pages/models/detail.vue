@@ -89,7 +89,8 @@ const isFav = computed(() => (model.value ? fav.has(model.value.id) : false))
 onLoad(async (options) => {
   const id = options?.id || ''
   try {
-    model.value = await getModelById(id)
+    // 无 id 时直接判空，避免请求 /api/models/ 误命中列表接口返回数组
+    model.value = id ? await getModelById(id) : null
   } catch {
     model.value = null
   } finally {

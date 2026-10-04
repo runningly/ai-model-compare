@@ -9,9 +9,11 @@ export const favoriteDao = {
     return rows.map((r) => r.model_id)
   },
 
-  /** 添加收藏（重复收藏直接忽略，天然幂等） */
+  /** 添加收藏（重复收藏直接忽略，天然幂等；created_at 存本地时间） */
   add(userId, modelId) {
-    db.prepare('INSERT OR IGNORE INTO favorites (user_id, model_id) VALUES (?, ?)').run(userId, modelId)
+    db.prepare(
+      "INSERT OR IGNORE INTO favorites (user_id, model_id, created_at) VALUES (?, ?, datetime('now', 'localtime'))"
+    ).run(userId, modelId)
   },
 
   remove(userId, modelId) {

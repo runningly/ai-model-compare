@@ -4,6 +4,11 @@
       <text>加载中...</text>
     </view>
 
+    <view v-else-if="loadError" class="empty" @click="refresh">
+      <text>加载失败，请确认后端服务已启动</text>
+      <text class="empty-sub">点击重试</text>
+    </view>
+
     <view v-else-if="list.length" class="model-list">
       <view v-for="m in list" :key="m.id" class="card">
         <view class="card-head" @click="goDetail(m.id)">
@@ -40,18 +45,22 @@ const fav = useFavoritesStore()
 // 每次进入页面：先同步一次云端收藏，再拉模型列表做过滤
 const models = ref<AIModel[]>([])
 const loading = ref(true)
+const loadError = ref(false)
 
-onShow(async () => {
+async function refresh() {
   loading.value = true
+  loadError.value = false
   try {
     await fav.hydrate()
     models.value = await getModels()
   } catch {
-    // 请求层已统一提示错误；此处保持空态展示
+    loadError.value = true
   } finally {
     loading.value = false
   }
-})
+}
+
+onShow(refresh)
 
 const list = computed(() => models.value.filter((m) => fav.ids.includes(m.id)))
 
