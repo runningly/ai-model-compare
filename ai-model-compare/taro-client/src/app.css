@@ -1,0 +1,13 @@
+/* 小程序端页面根节点 */
+page {
+  background-color: #f5f6fa;
+  color: #1f2329;
+  font-size: 28rpx;
+}
+
+/* H5 端页面根节点（Taro 渲染为 .taro_page） */
+.taro_page {
+  background-color: #f5f6fa;
+  color: #1f2329;
+  font-size: 28rpx;
+}

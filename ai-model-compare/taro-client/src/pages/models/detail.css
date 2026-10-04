@@ -1,0 +1,138 @@
+.page {
+  padding: 24rpx 24rpx 48rpx;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.model-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1f2329;
+}
+
+.vendor-tag {
+  font-size: 22rpx;
+  color: #3b5bff;
+  background-color: rgba(59, 91, 255, 0.08);
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.remark {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #8a8f99;
+}
+
+.card-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1f2329;
+  margin-bottom: 20rpx;
+}
+
+.price-tr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0f1f5;
+}
+
+.price-tr:last-child {
+  border-bottom: none;
+}
+
+.price-td-label {
+  font-size: 26rpx;
+  color: #4e5566;
+}
+
+.price-td-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3b5bff;
+}
+
+.param-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12rpx 0;
+}
+
+.param-label {
+  font-size: 26rpx;
+  color: #4e5566;
+}
+
+.param-value {
+  font-size: 26rpx;
+  color: #1f2329;
+  font-weight: 500;
+}
+
+.feature-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.feature-tag {
+  font-size: 22rpx;
+  color: #4e5566;
+  background-color: #f5f6fa;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  margin: 0 12rpx 8rpx 0;
+}
+
+.btn-row {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 8rpx;
+}
+
+.btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 30rpx;
+  border-radius: 16rpx;
+  margin: 0;
+  padding: 0;
+}
+
+.btn::after {
+  border: none;
+}
+
+.btn-ghost {
+  background-color: #ffffff;
+  color: #3b5bff;
+  border: 2rpx solid #3b5bff;
+}
+
+.btn-primary {
+  background-color: #3b5bff;
+  color: #ffffff;
+}
+
+.empty-page {
+  display: flex;
+  justify-content: center;
+  padding-top: 200rpx;
+  color: #8a8f99;
+  font-size: 26rpx;
+}
