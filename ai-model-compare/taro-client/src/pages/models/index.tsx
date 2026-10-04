@@ -58,21 +58,21 @@ export default function ModelsIndex() {
   }
 
   return (
-    <View className="page">
+    <View className='page'>
       {/* 搜索栏 */}
-      <View className="search-bar">
+      <View className='search-bar'>
         <Input
-          className="search-input"
-          placeholder="搜索模型，如 glm、deepseek"
-          placeholderStyle="color:#b0b4bf"
+          className='search-input'
+          placeholder='搜索模型，如 glm、deepseek'
+          placeholderStyle='color:#b0b4bf'
           value={keyword}
           onInput={(e) => setKeyword(e.detail.value)}
-          confirmType="search"
+          confirmType='search'
         />
       </View>
 
       {/* 厂商筛选 */}
-      <ScrollView className="vendor-row" scrollX showScrollbar={false}>
+      <ScrollView className='vendor-row' scrollX showScrollbar={false}>
         {vendorTabs.map((v) => (
           <View
             key={v}
@@ -84,57 +84,57 @@ export default function ModelsIndex() {
         ))}
       </ScrollView>
 
-      <View className="unit-note">价格单位：元 / 百万 tokens（演示快照，以官网为准）</View>
+      <View className='unit-note'>价格单位：元 / 百万 tokens（演示快照，以官网为准）</View>
 
       {/* 骨架屏：加载中 */}
       {loading ? (
-        <View className="model-list">
+        <View className='model-list'>
           {[0, 1, 2, 3].map((i) => (
-            <View key={i} className="card">
-              <View className="sk sk-name" />
-              <View className="sk sk-line" />
-              <View className="sk sk-line sk-line--short" />
+            <View key={i} className='card'>
+              <View className='sk sk-name' />
+              <View className='sk sk-line' />
+              <View className='sk sk-line sk-line--short' />
             </View>
           ))}
         </View>
       ) : loadError ? (
         /* 加载失败：点击重试 */
-        <View className="empty" onClick={load}>
+        <View className='empty' onClick={load}>
           <Text>加载失败，请确认后端服务已启动</Text>
-          <Text className="empty-retry">点击重试</Text>
+          <Text className='empty-retry'>点击重试</Text>
         </View>
       ) : (
-        <View className="model-list">
+        <View className='model-list'>
           {filteredModels.map((m) => (
-            <View key={m.id} className="card" hoverClass="card--hover" onClick={() => goDetail(m.id)}>
-              <View className="card-head">
-                <Text className="model-name">{m.modelName}</Text>
-                <Text className="vendor-tag">{m.vendor}</Text>
+            <View key={m.id} className='card' hoverClass='card--hover' onClick={() => goDetail(m.id)}>
+              <View className='card-head'>
+                <Text className='model-name'>{m.modelName}</Text>
+                <Text className='vendor-tag'>{m.vendor}</Text>
               </View>
-              <View className="meta-row">
-                <Text className="meta-item">上下文 {m.contextLength}K</Text>
-                <Text className="meta-item">最大输出 {m.maxOutput}K</Text>
-                {m.free ? <Text className="meta-item meta-free">限免</Text> : null}
+              <View className='meta-row'>
+                <Text className='meta-item'>上下文 {m.contextLength}K</Text>
+                <Text className='meta-item'>最大输出 {m.maxOutput}K</Text>
+                {m.free ? <Text className='meta-item meta-free'>限免</Text> : null}
               </View>
-              <View className="price-row">
-                <View className="price-item">
-                  <Text className="price-label">输入</Text>
-                  <Text className="price-value">{fmtPrice(m.priceList.input)}</Text>
+              <View className='price-row'>
+                <View className='price-item'>
+                  <Text className='price-label'>输入</Text>
+                  <Text className='price-value'>{fmtPrice(m.priceList.input)}</Text>
                 </View>
-                <View className="price-item">
-                  <Text className="price-label">输出</Text>
-                  <Text className="price-value">{fmtPrice(m.priceList.output)}</Text>
+                <View className='price-item'>
+                  <Text className='price-label'>输出</Text>
+                  <Text className='price-value'>{fmtPrice(m.priceList.output)}</Text>
                 </View>
                 {m.priceList.cacheHit != null ? (
-                  <View className="price-item">
-                    <Text className="price-label">缓存命中</Text>
-                    <Text className="price-value">{fmtPrice(m.priceList.cacheHit)}</Text>
+                  <View className='price-item'>
+                    <Text className='price-label'>缓存命中</Text>
+                    <Text className='price-value'>{fmtPrice(m.priceList.cacheHit)}</Text>
                   </View>
                 ) : null}
               </View>
-              <View className="feature-row">
+              <View className='feature-row'>
                 {m.features.slice(0, 3).map((f) => (
-                  <Text key={f} className="feature-tag">
+                  <Text key={f} className='feature-tag'>
                     {f}
                   </Text>
                 ))}
@@ -143,7 +143,7 @@ export default function ModelsIndex() {
           ))}
 
           {filteredModels.length === 0 ? (
-            <View className="empty">
+            <View className='empty'>
               <Text>没有找到匹配的模型</Text>
             </View>
           ) : null}

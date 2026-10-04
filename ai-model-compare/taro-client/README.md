@@ -48,7 +48,7 @@ npm run dev:weapp    # watch 模式，产物在 dist/
 npm run build:weapp   # 生产构建
 ```
 
-> 微信开发者工具导入 `dist/` 目录后，需勾选「详情 → 本地设置 → 不校验合法域名」才能请求 `localhost`。
+> 微信开发者工具导入 `dist/` 目录后即可请求 `localhost`（`project.config.json` 已配置 `urlCheck: false` 关闭域名校验）。
 
 ## 页面与功能
 

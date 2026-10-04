@@ -30,7 +30,10 @@ function getDeviceId(): string {
 
 // 模块级单例：与 Pinia store 等价的创建时机（import 时执行一次）
 const deviceId = getDeviceId()
+// 仅合并「在途」请求：完成后置空，下次 hydrate 重新拉取，保证每次进收藏页都同步云端
 let hydrateTask: Promise<void> | null = null
+// 本地 toggle 计数：hydrate 返回的旧快照若与中途的 toggle 竞态，跳过回写，下次同步对齐
+let toggleSeq = 0
 
 interface FavoritesState {
   ids: string[]
@@ -49,10 +52,15 @@ export const useFavoritesStore = create<FavoritesState>()((set, get) => ({
 
   hydrate: () => {
     if (!hydrateTask) {
+      const seq = toggleSeq
       hydrateTask = getFavoriteIds(deviceId)
         .then((list) => {
-          set({ ids: list })
-          persistIds(list)
+          hydrateTask = null
+          // 同步期间发生过本地 toggle：不用旧快照覆盖乐观更新，留待下次 hydrate 对齐
+          if (seq === toggleSeq) {
+            set({ ids: list })
+            persistIds(list)
+          }
         })
         .catch(() => {
           // 网络失败：保留本地缓存，并允许下次 hydrate 重试
@@ -63,6 +71,7 @@ export const useFavoritesStore = create<FavoritesState>()((set, get) => ({
   },
 
   toggle: (id) => {
+    toggleSeq += 1
     const ids = get().ids
     const adding = !ids.includes(id)
     const next = adding ? [...ids, id] : ids.filter((x) => x !== id)

@@ -46,13 +46,18 @@ export default function ModelDetail() {
       window.open(url, '_blank')
     } else if (process.env.TARO_ENV === 'weapp') {
       // 小程序内无法直接跳转外部网页，复制链接引导用户到浏览器打开
-      Taro.setClipboardData({ data: url })
+      Taro.setClipboardData({
+        data: url,
+        success: () => {
+          Taro.showToast({ title: '购买链接已复制', icon: 'none' })
+        },
+      })
     }
   }
 
   if (loading) {
     return (
-      <View className="page empty-page">
+      <View className='page empty-page'>
         <Text>加载中...</Text>
       </View>
     )
@@ -60,53 +65,53 @@ export default function ModelDetail() {
 
   if (!model) {
     return (
-      <View className="page empty-page">
+      <View className='page empty-page'>
         <Text>未找到该模型</Text>
       </View>
     )
   }
 
   return (
-    <View className="page">
+    <View className='page'>
       {/* 模型头部 */}
-      <View className="card">
-        <View className="head-row">
-          <Text className="model-name">{model.modelName}</Text>
-          <Text className="vendor-tag">{model.vendor}</Text>
+      <View className='card'>
+        <View className='head-row'>
+          <Text className='model-name'>{model.modelName}</Text>
+          <Text className='vendor-tag'>{model.vendor}</Text>
         </View>
-        {model.remark ? <Text className="remark">{model.remark}</Text> : null}
+        {model.remark ? <Text className='remark'>{model.remark}</Text> : null}
       </View>
 
       {/* 定价 */}
-      <View className="card">
-        <Text className="card-title">定价（元 / 百万 tokens）</Text>
-        <View className="price-table">
-          <View className="price-tr">
-            <Text className="price-td-label">输入</Text>
-            <Text className="price-td-value">{fmtPrice(model.priceList.input)}</Text>
+      <View className='card'>
+        <Text className='card-title'>定价（元 / 百万 tokens）</Text>
+        <View className='price-table'>
+          <View className='price-tr'>
+            <Text className='price-td-label'>输入</Text>
+            <Text className='price-td-value'>{fmtPrice(model.priceList.input)}</Text>
           </View>
-          <View className="price-tr">
-            <Text className="price-td-label">输出</Text>
-            <Text className="price-td-value">{fmtPrice(model.priceList.output)}</Text>
+          <View className='price-tr'>
+            <Text className='price-td-label'>输出</Text>
+            <Text className='price-td-value'>{fmtPrice(model.priceList.output)}</Text>
           </View>
           {model.priceList.cacheHit != null ? (
-            <View className="price-tr">
-              <Text className="price-td-label">缓存命中</Text>
-              <Text className="price-td-value">{fmtPrice(model.priceList.cacheHit)}</Text>
+            <View className='price-tr'>
+              <Text className='price-td-label'>缓存命中</Text>
+              <Text className='price-td-value'>{fmtPrice(model.priceList.cacheHit)}</Text>
             </View>
           ) : null}
           {model.priceList.peak ? (
-            <View className="price-tr">
-              <Text className="price-td-label">高峰时段（输入 / 输出）</Text>
-              <Text className="price-td-value">
+            <View className='price-tr'>
+              <Text className='price-td-label'>高峰时段（输入 / 输出）</Text>
+              <Text className='price-td-value'>
                 {fmtPrice(model.priceList.peak.input)} / {fmtPrice(model.priceList.peak.output)}
               </Text>
             </View>
           ) : null}
           {model.priceList.offPeak ? (
-            <View className="price-tr">
-              <Text className="price-td-label">空闲时段（输入 / 输出）</Text>
-              <Text className="price-td-value">
+            <View className='price-tr'>
+              <Text className='price-td-label'>空闲时段（输入 / 输出）</Text>
+              <Text className='price-td-value'>
                 {fmtPrice(model.priceList.offPeak.input)} / {fmtPrice(model.priceList.offPeak.output)}
               </Text>
             </View>
@@ -115,24 +120,24 @@ export default function ModelDetail() {
       </View>
 
       {/* 模型参数 */}
-      <View className="card">
-        <Text className="card-title">模型参数</Text>
-        <View className="param-row">
-          <Text className="param-label">上下文窗口</Text>
-          <Text className="param-value">{model.contextLength}K tokens</Text>
+      <View className='card'>
+        <Text className='card-title'>模型参数</Text>
+        <View className='param-row'>
+          <Text className='param-label'>上下文窗口</Text>
+          <Text className='param-value'>{model.contextLength}K tokens</Text>
         </View>
-        <View className="param-row">
-          <Text className="param-label">最大输出</Text>
-          <Text className="param-value">{model.maxOutput}K tokens</Text>
+        <View className='param-row'>
+          <Text className='param-label'>最大输出</Text>
+          <Text className='param-value'>{model.maxOutput}K tokens</Text>
         </View>
       </View>
 
       {/* 功能特性 */}
-      <View className="card">
-        <Text className="card-title">功能特性</Text>
-        <View className="feature-row">
+      <View className='card'>
+        <Text className='card-title'>功能特性</Text>
+        <View className='feature-row'>
           {model.features.map((f) => (
-            <Text key={f} className="feature-tag">
+            <Text key={f} className='feature-tag'>
               {f}
             </Text>
           ))}
@@ -140,11 +145,11 @@ export default function ModelDetail() {
       </View>
 
       {/* 操作按钮 */}
-      <View className="btn-row">
-        <Button className="btn btn-ghost" onClick={toggleFav}>
+      <View className='btn-row'>
+        <Button className='btn btn-ghost' onClick={toggleFav}>
           {isFav ? '取消收藏' : '收藏'}
         </Button>
-        <Button className="btn btn-primary" onClick={goBuy}>
+        <Button className='btn btn-primary' onClick={goBuy}>
           去官网购买
         </Button>
       </View>
