@@ -1,6 +1,25 @@
 /**
- * 各厂商模型定价数据（与前端 mock 保持一致的演示快照，以官网实时定价为准）
- * 价格单位：元 / 百万 tokens
+ * 模型演示数据（seed 脚本的数据源）
+ * -------------------------------------------------
+ * 说明：这是一份"静态快照"，与前端 mock 数据保持一致，真实项目应以官网实时定价为准。
+ * 价格单位：元 / 百万 tokens（即每调用一百万 tokens 的费用）。
+ *
+ * 各字段含义：
+ * - id            模型唯一标识，同时作为数据库 models 表的主键
+ * - modelName     模型显示名
+ * - vendor        所属厂商
+ * - contextLength 上下文长度（单位：K tokens）
+ * - maxOutput     最大输出长度（单位：K tokens）
+ * - priceList     价格结构。注意：不同厂商的字段并不统一！
+ *     · input / output    输入 / 输出单价（免费模型可传 null，如 glm-4.5-flash）
+ *     · cacheHit          缓存命中单价（仅部分厂商提供）
+ *     · peak / offPeak    高峰 / 低谷时段价（仅部分厂商提供，DeepSeek 有）
+ *   —— 正因为结构不统一，入库时才整体存成 JSON 字符串（models.price_list），
+ *      读取时原样还原，由前端按"字段是否存在"做兼容展示。
+ * - features      特性标签数组
+ * - purchaseUrl   官方购买 / 控制台地址
+ * - free          是否免费
+ * - remark        备注说明
  */
 export const models = [
   {
