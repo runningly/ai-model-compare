@@ -19,6 +19,7 @@ export default defineAppConfig({
     navigationBarBackgroundColor: '#ffffff',
     navigationBarTitleText: 'AI 模型比价',
     navigationBarTextStyle: 'black',
+    navigationStyle: 'default',
     backgroundColor: '#f5f6fa',
   },
 })
