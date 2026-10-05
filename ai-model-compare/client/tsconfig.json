@@ -1,6 +1,22 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.json",
+  // 说明：不继承 @vue/tsconfig，因其旧版（0.1.3）的 importsNotUsedAsValues /
+  // preserveValueImports 在 TypeScript 5.x 中已删除（TS5069），且新版声明了
+  // verbatimModuleSyntax/noEmit 等激进默认。这里内联兼容 TS4.9 与 TS5 两端的选项。
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "useDefineForClassFields": true,
+    "jsx": "preserve",
+    "noImplicitThis": true,
+    "strict": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
