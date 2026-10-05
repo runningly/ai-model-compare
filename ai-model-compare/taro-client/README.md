@@ -25,9 +25,10 @@ taro-client/
 │   ├── pages/
 │   │   ├── models/          # 列表页 + 详情页（detail）
 │   │   └── favorites/       # 收藏页
-│   ├── stores/favorites.ts  # Zustand 收藏 store（乐观更新 + 云端同步）
-│   ├── types/model.ts       # AIModel 等类型定义
-│   ├── utils/request.ts     # Taro.request Promise 封装
+│   │   ├── stores/favorites.ts  # Zustand 收藏 store（乐观更新 + 云端同步）
+│   │   ├── types/model.ts       # AIModel 等类型定义
+│   │   ├── utils/request.ts     # Taro.request Promise 封装
+│   │   ├── utils/pricing.ts     # 价格工具：费用计算 / 格式化（价格测算、对比表共用）
 │   ├── app.ts               # 应用入口（启动时 hydrate 收藏）
 │   └── app.config.ts        # 页面路由 + tabBar
 └── package.json
@@ -53,8 +54,8 @@ npm run build:weapp   # 生产构建
 ## 页面与功能
 
 - **模型列表**（tabBar 首页）：真实接口加载 + 骨架屏、失败重试；关键字搜索（模型名/厂商，不区分大小写）、厂商 chips（由接口数据动态生成）、价格单位「元 / 百万 tokens」
-- **模型详情**（非 tab 页，`?id=xxx`）：定价表（输入/输出/缓存命中/高峰/空闲时段）、模型参数、功能特性；收藏乐观更新 + toast；「去官网购买」H5 直接 `window.open`，小程序复制链接到剪贴板
-- **我的收藏**（tabBar）：每次 `useDidShow` 先同步云端再拉列表过滤；空态引导、失败重试、查看详情/移除
+- **模型详情**（非 tab 页，`?id=xxx`）：定价表（输入/输出/缓存命中/高峰/空闲时段）、**价格测算器**（输入/输出 token 用量实时估算费用，含高峰/空闲时段合计、免费模型提示、空输入占位）、模型参数、功能特性；收藏乐观更新 + toast；「去官网购买」H5 直接 `window.open`，小程序复制链接到剪贴板
+- **我的收藏**（tabBar）：每次 `useDidShow` 先同步云端再拉列表过滤；**收藏 ≥2 个模型时顶部展示价格对比表**（模型/输入/输出/缓存/上下文横向对比，缓存缺失显示 `-`）；空态引导、失败重试、查看详情/移除
 
 ## 后端接口约定
 

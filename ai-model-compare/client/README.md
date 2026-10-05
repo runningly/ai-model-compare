@@ -21,14 +21,15 @@ client/
 │   ├── pages/
 │   │   ├── models/
 │   │   │   ├── index.vue        # 模型列表页（tab 1：列表 + 搜索 + 厂商筛选 + 收藏）
-│   │   │   └── detail.vue       # 模型详情页（定价、特性、官网跳转、收藏）
+│   │   │   └── detail.vue       # 模型详情页（定价、价格测算、特性、官网跳转、收藏）
 │   │   └── favorites/
-│   │       └── index.vue        # 我的收藏页（tab 2：收藏列表 + 取消收藏）
+│   │       └── index.vue        # 我的收藏页（tab 2：收藏列表 + 多模型价格对比表）
 │   ├── api/
 │   │   ├── models.ts            # 模型接口：列表 / 详情
 │   │   └── favorites.ts         # 收藏接口：查询 / 添加 / 取消
 │   ├── utils/
-│   │   └── request.ts           # uni.request 的 Promise 封装
+│   │   ├── request.ts           # uni.request 的 Promise 封装
+│   │   └── pricing.ts           # 价格工具：费用计算 / 格式化（价格测算、对比表共用）
 │   ├── config/
 │   │   └── env.ts               # 接口基础地址（开发/生产）
 │   ├── stores/
@@ -68,8 +69,8 @@ npm run dev:mp-weixin     # 微信小程序开发（需用微信开发者工具�
 | 路径 | 页面 | 说明 |
 |---|---|---|
 | `pages/models/index` | 模型列表（tab 1） | 搜索、厂商筛选、行内收藏 |
-| `pages/favorites/index` | 我的收藏（tab 2） | 收藏的模型列表、取消收藏 |
-| `pages/models/detail` | 模型详情 | 定价 / 特性 / 官网购买跳转 |
+| `pages/favorites/index` | 我的收藏（tab 2） | 收藏的模型列表、多模型价格对比表 |
+| `pages/models/detail` | 模型详情 | 定价 / 价格测算 / 特性 / 官网购买跳转 |
 
 ## 网络请求层
 
@@ -100,6 +101,19 @@ removeFavorite(userId, modelId)      // DELETE /api/favorites/:modelId?userId=xx
 - **hydrate 云端同步**：进入收藏页时拉取服务端收藏列表对齐本地；失败沿用本地缓存，下次可重试
 - **竞态守卫**：`toggleSeq` 计数器避免「同步返回的旧快照覆盖用户刚做的 toggle」，冲突时留待下次同步对齐
 - 失败回滚由服务端在下次 hydrate 时自然对齐，本地不强行回滚
+
+## 价格测算与对比（M3）
+
+[src/utils/pricing.ts](src/utils/pricing.ts) 提供双端共用的价格工具（uni-app 与 Taro 版逻辑一致）：
+
+```ts
+calcCost(tokens, price)   // 费用 = tokens / 1e6 × 单价；无价格返回 null
+formatCost(v)             // 格式化：null → '免费'；0 → '¥0.00'；金额 ≥1 保留 2 位，否则 4 位（消除浮点尾差）
+formatPrice(v)            // 对比表用：null → '免费'，数字 → formatCost
+```
+
+- **详情页价格测算器**：输入/输出 token 用量实时估算费用（输入费 / 输出费 / 合计），有峰谷价的模型（如 DeepSeek）额外显示高峰、空闲时段合计；免费模型直接提示「该模型免费」，两个输入都为空时显示占位引导，输入框仅允许数字与一个小数点
+- **收藏页价格对比表**：收藏 ≥2 个模型时在列表顶部展示横向对比（模型 / 输入 / 输出 / 缓存 / 上下文），缓存价缺失显示 `-`，长模型名自动截断
 
 ## 接口地址配置
 
