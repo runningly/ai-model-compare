@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Taro, { useLoad } from '@tarojs/taro'
-import { View, Text, Button } from '@tarojs/components'
+import { View, Text, Button, Input } from '@tarojs/components'
 import { getModelById } from '../../api/models'
 import type { AIModel } from '../../types/model'
 import { useFavoritesStore } from '../../stores/favorites'
+import { calcCost, formatCost } from '../../utils/pricing'
 import './detail.css'
 
 export default function ModelDetail() {
@@ -13,6 +14,33 @@ export default function ModelDetail() {
   const ids = useFavoritesStore((s) => s.ids)
   const toggle = useFavoritesStore((s) => s.toggle)
   const isFav = model ? ids.includes(model.id) : false
+
+  // 价格测算：输入的 token 用量（Input 值恒为 string，计算时再转数字）
+  const [inputTokens, setInputTokens] = useState('')
+  const [outputTokens, setOutputTokens] = useState('')
+
+  const isFree = !!model && model.priceList.input == null && model.priceList.output == null
+
+  // 两个输入框都为空时展示占位提示，不显示估算结果
+  const hasInput = inputTokens !== '' || outputTokens !== ''
+
+  const cost = useMemo(() => {
+    const p = model?.priceList
+    const i = Number(inputTokens) || 0
+    const o = Number(outputTokens) || 0
+    const baseInput = calcCost(i, p?.input)
+    const baseOutput = calcCost(o, p?.output)
+    const total = baseInput != null && baseOutput != null ? baseInput + baseOutput : null
+    const peak = p?.peak ? (calcCost(i, p.peak.input) ?? 0) + (calcCost(o, p.peak.output) ?? 0) : null
+    const offPeak = p?.offPeak ? (calcCost(i, p.offPeak.input) ?? 0) + (calcCost(o, p.offPeak.output) ?? 0) : null
+    return {
+      input: formatCost(baseInput),
+      output: formatCost(baseOutput),
+      total: formatCost(total),
+      peak: formatCost(peak),
+      offPeak: formatCost(offPeak),
+    }
+  }, [model, inputTokens, outputTokens])
 
   const router = Taro.useRouter()
 
@@ -117,6 +145,73 @@ export default function ModelDetail() {
             </View>
           ) : null}
         </View>
+      </View>
+
+      {/* 价格测算 */}
+      <View className='card'>
+        <Text className='card-title'>价格测算</Text>
+        {isFree ? (
+          <Text className='pcalc-free'>该模型免费，无需测算费用</Text>
+        ) : (
+          <>
+            <View className='pcalc-input-row'>
+              <Text className='pcalc-label'>输入 tokens</Text>
+              <Input
+                className='pcalc-input'
+                type='digit'
+                placeholder='如 100000'
+                value={inputTokens}
+                onInput={(e) => {
+                  const v = e.detail.value
+                  if (/^\d*\.?\d*$/.test(v)) setInputTokens(v)
+                }}
+              />
+            </View>
+            <View className='pcalc-input-row'>
+              <Text className='pcalc-label'>输出 tokens</Text>
+              <Input
+                className='pcalc-input'
+                type='digit'
+                placeholder='如 20000'
+                value={outputTokens}
+                onInput={(e) => {
+                  const v = e.detail.value
+                  if (/^\d*\.?\d*$/.test(v)) setOutputTokens(v)
+                }}
+              />
+            </View>
+            {hasInput ? (
+              <View className='pcalc-result'>
+                <View className='price-tr'>
+                  <Text className='price-td-label'>输入费用</Text>
+                  <Text className='price-td-value'>{cost.input}</Text>
+                </View>
+                <View className='price-tr'>
+                  <Text className='price-td-label'>输出费用</Text>
+                  <Text className='price-td-value'>{cost.output}</Text>
+                </View>
+                <View className='price-tr'>
+                  <Text className='price-td-label'>合计</Text>
+                  <Text className='price-td-value'>{cost.total}</Text>
+                </View>
+                {model.priceList.peak ? (
+                  <View className='price-tr'>
+                    <Text className='price-td-label'>高峰时段合计</Text>
+                    <Text className='price-td-value'>{cost.peak}</Text>
+                  </View>
+                ) : null}
+                {model.priceList.offPeak ? (
+                  <View className='price-tr'>
+                    <Text className='price-td-label'>空闲时段合计</Text>
+                    <Text className='price-td-value'>{cost.offPeak}</Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : (
+              <Text className='pcalc-free'>输入 token 用量后自动估算费用</Text>
+            )}
+          </>
+        )}
       </View>
 
       {/* 模型参数 */}

@@ -136,3 +136,36 @@
   color: #8a8f99;
   font-size: 26rpx;
 }
+
+/* 价格测算 */
+.pcalc-free {
+  font-size: 26rpx;
+  color: #8a8f99;
+}
+
+.pcalc-input-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.pcalc-label {
+  width: 180rpx;
+  font-size: 26rpx;
+  color: #4e5566;
+}
+
+.pcalc-input {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #1f2329;
+  background-color: #f5f6fa;
+  border-radius: 12rpx;
+}
+
+.pcalc-result {
+  margin-top: 8rpx;
+}
+

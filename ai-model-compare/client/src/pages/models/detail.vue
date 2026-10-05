@@ -40,6 +40,47 @@
       </view>
     </view>
 
+    <!-- 价格测算 -->
+    <view class="card">
+      <text class="card-title">价格测算</text>
+      <template v-if="isFree">
+        <text class="pcalc-free">该模型免费，无需测算费用</text>
+      </template>
+      <template v-else>
+        <view class="pcalc-input-row">
+          <text class="pcalc-label">输入 tokens</text>
+          <input class="pcalc-input" type="digit" placeholder="如 100000" :value="inputTokens" @input="onInputTokens" />
+        </view>
+        <view class="pcalc-input-row">
+          <text class="pcalc-label">输出 tokens</text>
+          <input class="pcalc-input" type="digit" placeholder="如 20000" :value="outputTokens" @input="onOutputTokens" />
+        </view>
+        <view v-if="hasInput" class="pcalc-result">
+          <view class="price-tr">
+            <text class="price-td-label">输入费用</text>
+            <text class="price-td-value">{{ cost.input }}</text>
+          </view>
+          <view class="price-tr">
+            <text class="price-td-label">输出费用</text>
+            <text class="price-td-value">{{ cost.output }}</text>
+          </view>
+          <view class="price-tr">
+            <text class="price-td-label">合计</text>
+            <text class="price-td-value">{{ cost.total }}</text>
+          </view>
+          <view v-if="model.priceList.peak" class="price-tr">
+            <text class="price-td-label">高峰时段合计</text>
+            <text class="price-td-value">{{ cost.peak }}</text>
+          </view>
+          <view v-if="model.priceList.offPeak" class="price-tr">
+            <text class="price-td-label">空闲时段合计</text>
+            <text class="price-td-value">{{ cost.offPeak }}</text>
+          </view>
+        </view>
+        <text v-else class="pcalc-free">输入 token 用量后自动估算费用</text>
+      </template>
+    </view>
+
     <!-- 模型参数 -->
     <view class="card">
       <text class="card-title">模型参数</text>
@@ -79,12 +120,54 @@ import { onLoad } from '@dcloudio/uni-app'
 import { getModelById } from '@/api/models'
 import type { AIModel } from '@/types/model'
 import { useFavoritesStore } from '@/stores/favorites'
+import { calcCost, formatCost } from '@/utils/pricing'
 
 const model = ref<AIModel | null>(null)
 const loading = ref(true)
 const fav = useFavoritesStore()
 
 const isFav = computed(() => (model.value ? fav.has(model.value.id) : false))
+
+// 价格测算：输入的 token 用量（input 值恒为 string，计算时再转数字）
+const inputTokens = ref('')
+const outputTokens = ref('')
+
+const isFree = computed(() => {
+  const p = model.value?.priceList
+  return !!p && p.input == null && p.output == null
+})
+
+const cost = computed(() => {
+  const p = model.value?.priceList
+  const i = Number(inputTokens.value) || 0
+  const o = Number(outputTokens.value) || 0
+  const baseInput = calcCost(i, p?.input)
+  const baseOutput = calcCost(o, p?.output)
+  const total = baseInput != null && baseOutput != null ? baseInput + baseOutput : null
+  const peak = p?.peak ? (calcCost(i, p.peak.input) ?? 0) + (calcCost(o, p.peak.output) ?? 0) : null
+  const offPeak = p?.offPeak ? (calcCost(i, p.offPeak.input) ?? 0) + (calcCost(o, p.offPeak.output) ?? 0) : null
+  return {
+    input: formatCost(baseInput),
+    output: formatCost(baseOutput),
+    total: formatCost(total),
+    peak: formatCost(peak),
+    offPeak: formatCost(offPeak),
+  }
+})
+
+// 两个输入框都为空时展示占位提示，不显示估算结果
+const hasInput = computed(() => inputTokens.value !== '' || outputTokens.value !== '')
+
+// 仅允许数字与一个小数点，避免 H5 端输入字母等非法字符
+function onInputTokens(e: { detail: { value: string } }) {
+  const v = e.detail.value
+  if (/^\d*\.?\d*$/.test(v)) inputTokens.value = v
+}
+
+function onOutputTokens(e: { detail: { value: string } }) {
+  const v = e.detail.value
+  if (/^\d*\.?\d*$/.test(v)) outputTokens.value = v
+}
 
 onLoad(async (options) => {
   const id = options?.id || ''
@@ -264,4 +347,37 @@ function goBuy() {
   color: #8a8f99;
   font-size: 26rpx;
 }
+
+/* 价格测算 */
+.pcalc-free {
+  font-size: 26rpx;
+  color: #8a8f99;
+}
+
+.pcalc-input-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.pcalc-label {
+  width: 180rpx;
+  font-size: 26rpx;
+  color: #4e5566;
+}
+
+.pcalc-input {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #1f2329;
+  background-color: #f5f6fa;
+  border-radius: 12rpx;
+}
+
+.pcalc-result {
+  margin-top: 8rpx;
+}
+
 </style>

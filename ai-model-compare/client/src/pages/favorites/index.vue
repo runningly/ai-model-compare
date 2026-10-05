@@ -9,8 +9,29 @@
       <text class="empty-sub">点击重试</text>
     </view>
 
-    <view v-else-if="list.length" class="model-list">
-      <view v-for="m in list" :key="m.id" class="card">
+    <view v-else-if="list.length">
+      <!-- 多模型价格对比表（≥2 个收藏时展示） -->
+      <view v-if="list.length >= 2" class="card">
+        <text class="card-title">价格对比</text>
+        <view class="cmp-table">
+          <view class="cmp-row cmp-row--head">
+            <text class="cmp-cell cmp-cell--name">模型</text>
+            <text class="cmp-cell">输入</text>
+            <text class="cmp-cell">输出</text>
+            <text class="cmp-cell">缓存</text>
+            <text class="cmp-cell">上下文</text>
+          </view>
+          <view v-for="m in list" :key="m.id" class="cmp-row">
+            <text class="cmp-cell cmp-cell--name">{{ m.modelName }}</text>
+            <text class="cmp-cell">{{ formatPrice(m.priceList.input) }}</text>
+            <text class="cmp-cell">{{ formatPrice(m.priceList.output) }}</text>
+            <text class="cmp-cell">{{ m.priceList.cacheHit != null ? formatPrice(m.priceList.cacheHit) : '-' }}</text>
+            <text class="cmp-cell">{{ m.contextLength }}K</text>
+          </view>
+        </view>
+      </view>
+      <view class="model-list">
+        <view v-for="m in list" :key="m.id" class="card">
         <view class="card-head" @click="goDetail(m.id)">
           <text class="model-name">{{ m.modelName }}</text>
           <text class="vendor-tag">{{ m.vendor }}</text>
@@ -22,6 +43,7 @@
         <view class="btn-row">
           <button class="btn-mini" @click="goDetail(m.id)">查看详情</button>
           <button class="btn-mini btn-mini--danger" @click="remove(m.id)">移除</button>
+        </view>
         </view>
       </view>
     </view>
@@ -39,6 +61,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { getModels } from '@/api/models'
 import { useFavoritesStore } from '@/stores/favorites'
 import type { AIModel } from '@/types/model'
+import { formatPrice } from '@/utils/pricing'
 
 const fav = useFavoritesStore()
 
@@ -162,4 +185,49 @@ function goDetail(id: string) {
   font-size: 24rpx;
   color: #b0b4bf;
 }
+
+/* 价格对比表 */
+.cmp-table {
+  border: 1rpx solid #f0f1f5;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.cmp-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1rpx solid #f0f1f5;
+}
+
+.cmp-row:last-child {
+  border-bottom: none;
+}
+
+.cmp-row--head {
+  background-color: #f5f6fa;
+}
+
+.cmp-cell {
+  flex: 0 0 18%;
+  padding: 16rpx 8rpx;
+  font-size: 22rpx;
+  color: #4e5566;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cmp-cell--name {
+  flex: 0 0 28%;
+  min-width: 0;
+  padding-left: 16rpx;
+  text-align: left;
+}
+
+.cmp-row--head .cmp-cell {
+  font-weight: 600;
+  color: #1f2329;
+}
+
 </style>

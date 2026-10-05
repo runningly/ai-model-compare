@@ -4,6 +4,7 @@ import { View, Text, Button } from '@tarojs/components'
 import { getModels } from '../../api/models'
 import { useFavoritesStore } from '../../stores/favorites'
 import type { AIModel } from '../../types/model'
+import { formatPrice } from '../../utils/pricing'
 import './index.css'
 
 export default function FavoritesIndex() {
@@ -82,6 +83,32 @@ export default function FavoritesIndex() {
 
   return (
     <View className='page'>
+      {/* 多模型价格对比表（≥2 个收藏时展示） */}
+      {list.length >= 2 ? (
+        <View className='card'>
+          <Text className='card-title'>价格对比</Text>
+          <View className='cmp-table'>
+            <View className='cmp-row cmp-row--head'>
+              <Text className='cmp-cell cmp-cell--name'>模型</Text>
+              <Text className='cmp-cell'>输入</Text>
+              <Text className='cmp-cell'>输出</Text>
+              <Text className='cmp-cell'>缓存</Text>
+              <Text className='cmp-cell'>上下文</Text>
+            </View>
+            {list.map((m) => (
+              <View key={m.id} className='cmp-row'>
+                <Text className='cmp-cell cmp-cell--name'>{m.modelName}</Text>
+                <Text className='cmp-cell'>{formatPrice(m.priceList.input)}</Text>
+                <Text className='cmp-cell'>{formatPrice(m.priceList.output)}</Text>
+                <Text className='cmp-cell'>
+                  {m.priceList.cacheHit != null ? formatPrice(m.priceList.cacheHit) : '-'}
+                </Text>
+                <Text className='cmp-cell'>{m.contextLength}K</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : null}
       <View className='model-list'>
         {list.map((m) => (
           <View key={m.id} className='card'>
