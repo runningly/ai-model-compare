@@ -13,22 +13,24 @@
       <!-- 多模型价格对比表（≥2 个收藏时展示） -->
       <view v-if="list.length >= 2" class="card">
         <text class="card-title">价格对比</text>
-        <view class="cmp-table">
-          <view class="cmp-row cmp-row--head">
-            <text class="cmp-cell cmp-cell--name">模型</text>
-            <text class="cmp-cell">输入</text>
-            <text class="cmp-cell">输出</text>
-            <text class="cmp-cell">缓存</text>
-            <text class="cmp-cell">上下文</text>
+        <scroll-view scroll-x class="cmp-scroll">
+          <view class="cmp-table">
+            <view class="cmp-row cmp-row--head">
+              <text class="cmp-cell cmp-cell--name">模型</text>
+              <text class="cmp-cell">输入</text>
+              <text class="cmp-cell">输出</text>
+              <text class="cmp-cell">缓存</text>
+              <text class="cmp-cell">上下文</text>
+            </view>
+            <view v-for="m in list" :key="m.id" class="cmp-row">
+              <text class="cmp-cell cmp-cell--name">{{ m.modelName }}</text>
+              <text class="cmp-cell">{{ formatPrice(m.priceList.input) }}</text>
+              <text class="cmp-cell">{{ formatPrice(m.priceList.output) }}</text>
+              <text class="cmp-cell">{{ m.priceList.cacheHit != null ? formatPrice(m.priceList.cacheHit) : '-' }}</text>
+              <text class="cmp-cell">{{ m.contextLength }}K</text>
+            </view>
           </view>
-          <view v-for="m in list" :key="m.id" class="cmp-row">
-            <text class="cmp-cell cmp-cell--name">{{ m.modelName }}</text>
-            <text class="cmp-cell">{{ formatPrice(m.priceList.input) }}</text>
-            <text class="cmp-cell">{{ formatPrice(m.priceList.output) }}</text>
-            <text class="cmp-cell">{{ m.priceList.cacheHit != null ? formatPrice(m.priceList.cacheHit) : '-' }}</text>
-            <text class="cmp-cell">{{ m.contextLength }}K</text>
-          </view>
-        </view>
+        </scroll-view>
       </view>
       <view class="model-list">
         <view v-for="m in list" :key="m.id" class="card">
@@ -187,10 +189,15 @@ function goDetail(id: string) {
 }
 
 /* 价格对比表 */
+.cmp-scroll {
+  width: 100%;
+}
+
 .cmp-table {
   border: 1rpx solid #f0f1f5;
   border-radius: 12rpx;
   overflow: hidden;
+  min-width: 100%;
 }
 
 .cmp-row {
@@ -209,6 +216,7 @@ function goDetail(id: string) {
 
 .cmp-cell {
   flex: 0 0 18%;
+  box-sizing: border-box;
   padding: 16rpx 8rpx;
   font-size: 22rpx;
   color: #4e5566;

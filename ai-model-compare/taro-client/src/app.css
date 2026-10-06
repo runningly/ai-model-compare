@@ -11,3 +11,8 @@ page {
   color: #1f2329;
   font-size: 28rpx;
 }
+
+/* H5 端顶部导航栏标题字号（覆盖 Taro 运行时注入的默认 24px） */
+#taro-navigation-bar .taro-navigation-bar-title {
+  font-size: 34rpx;
+}
