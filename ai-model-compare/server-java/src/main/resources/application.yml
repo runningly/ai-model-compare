@@ -1,0 +1,39 @@
+# 应用配置文件（application.yml）—— Spring Boot 的"中央配置"
+# ----------------------------------------------------
+# 对比学习：Node 版把配置直接写在代码里（如 `process.env.PORT || 3000`），
+# Spring Boot 的惯例是把可变配置集中到本文件，代码只读配置，改配置不用改代码。
+# yml 用两个空格缩进表示层级（切勿用 Tab）。
+
+server:
+  # 服务端口：Node 版是 process.env.PORT || 3000；Spring 用 server.port 配置
+  # 也可用命令行覆盖：--server.port=9090
+  port: 8080
+
+spring:
+  application:
+    # 应用名（日志/监控用，不影响功能）
+    name: model-compare-server-java
+
+  datasource:
+    # SQLite JDBC 连接串。相对路径 = 相对"启动时的工作目录"，
+    # 因此必须在本目录（server-java）下执行 mvn spring-boot:run —— 与 Node 版 npm run 语义一致。
+    # 换 PostgreSQL/MySQL 时只需改这里 + pom 换驱动，业务代码不动。
+    url: jdbc:sqlite:data/models.db
+    # 显式声明驱动类（其实 Spring 能从 url 前缀自动推断，写出来便于学习）
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      # 连接池上限设为 1：SQLite 是"库级单写者"数据库，多连接并发写会报 database is locked。
+      # Node 版 better-sqlite3 本身就是单连接，这里把连接池压成 1，让 Java 版行为与它对齐。
+      maximum-pool-size: 1
+
+mybatis:
+  configuration:
+    # 数据库字段 snake_case 自动映射到 Java 属性 camelCase（model_name → modelName）。
+    # 本项目的 Mapper 用 @Results 显式映射（更能体现 rowToModel 的转换过程），此开关作为兜底。
+    map-underscore-to-camel-case: true
+
+# 对比学习：logging.level 可按包名调日志级别（DEBUG 可看到 MyBatis 打印的完整 SQL）
+# 调试时取消注释即可：
+# logging:
+#   level:
+#     com.aimodel.compare: debug
