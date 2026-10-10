@@ -159,13 +159,22 @@ const cost = computed(() => {
 const hasInput = computed(() => inputTokens.value !== '' || outputTokens.value !== '')
 
 // 仅允许数字与一个小数点，避免 H5 端输入字母等非法字符
-function onInputTokens(e: { detail: { value: string } }) {
-  const v = e.detail.value
+// uni-app 的 input 事件类型声明与运行时不一致（类型把 detail 声明为 number，
+// 运行时实际为 { value: string }），用联合类型兼容两种形态后统一转字符串
+type UniInputEvent = { detail: number } | { detail: { value: string | number } }
+
+function getInputValue(e: UniInputEvent): string {
+  const detail = e.detail
+  return typeof detail === 'object' && detail !== null ? String(detail.value) : String(detail)
+}
+
+function onInputTokens(e: UniInputEvent) {
+  const v = getInputValue(e)
   if (/^\d*\.?\d*$/.test(v)) inputTokens.value = v
 }
 
-function onOutputTokens(e: { detail: { value: string } }) {
-  const v = e.detail.value
+function onOutputTokens(e: UniInputEvent) {
+  const v = getInputValue(e)
   if (/^\d*\.?\d*$/.test(v)) outputTokens.value = v
 }
 
